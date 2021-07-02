@@ -1,10 +1,18 @@
 <script>
     export let doShowHelp;
+    export let currentPath;
+    export let basePath;
+    export let doHome;
 </script>
 
 <header>
     <h1>Canvas Omnibus</h1>
+
     <button class="right" on:click={doShowHelp}>Help</button>
+    {#if currentPath !== basePath}
+        <button class="right" on:click={doHome}>Home</button>
+    {/if}
+
 </header>
 
 <style>
@@ -34,5 +42,6 @@
         background:linear-gradient( 180deg, #727a89, #A9Aefa );
         cursor: pointer;
         border-radius: 0.5em;
+        margin-right: 1em;
     }
 </style>

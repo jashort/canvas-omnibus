@@ -1,47 +1,66 @@
 <script>
-	import {getDirectories, getFiles} from "./files";
+	import {getDirectories, getLinks} from "./files";
 	import Header from "./Header.svelte";
 	import Help from "./Help.svelte";
 
 	export let basePath;
 
-	let currentImage = 0;
+	let currentPath = basePath;
+	let currentImageIndex = 0;
 	let imageUrl = '';
 
 	let directories = [];
 	let images = [];
 	let page = "";
 
-	showDirectoryList();
+	loadPath(currentPath)
 
-	async function showPath(path) {
-		images = await getFiles(path)
-		currentImage = Math.floor(Math.random() * images.length);
-		imageUrl = images[currentImage];
-		page = 'slide';
+	async function loadPath(path) {
+		console.log('Loading ' + path + '...');
+		let links = await getLinks(path)
+		currentPath = path;
+		directories = links.filter(e => e.type === 'directory')
+		images = links.filter(e => e.type === 'image')
+
+		if (directories.length > 0) {
+			showDirectoryList();
+		} else if (images.length > 0) {
+			showRandomImage();
+		} else {
+			alert('no images found');
+		}
 	}
 
-	async function showDirectoryList() {
-		directories = await getDirectories(basePath);
+	function showDirectoryList() {
 		page = 'directoryList';
 	}
 
+	function showHome() {
+		loadPath(basePath);
+	}
+
+	function showRandomImage() {
+		page = 'slide';
+		currentImageIndex = Math.floor(Math.random() * images.length);
+		imageUrl = images[currentImageIndex].url;
+	}
+
 	function showNext() {
-		if (currentImage < images.length - 1) {
-			currentImage += 1;
+		if (currentImageIndex < images.length - 1) {
+			currentImageIndex += 1;
 		} else {
-			currentImage = 0;
+			currentImageIndex = 0;
 		}
-		imageUrl = images[currentImage];
+		imageUrl = images[currentImageIndex].url;
 	}
 
 	function showPrev() {
-		if (currentImage > 0) {
-			currentImage -= 1;
+		if (currentImageIndex > 0) {
+			currentImageIndex -= 1;
 		} else {
-			currentImage = images.length - 1;
+			currentImageIndex = images.length - 1;
 		}
-		imageUrl = images[currentImage];
+		imageUrl = images[currentImageIndex].url;
 	}
 
 	function showHelp() {
@@ -82,20 +101,23 @@
 			<div class="nav navNext" on:click="{showNext}"></div>
 			<div class="nav navPrev" on:click="{showPrev}"></div>
 			<div class="back" on:click={showDirectoryList}>Back</div>
-			<div class="filename" id="filename">{currentImage+1}/{images.length}</div>
+			<div class="filename" id="filename">{currentImageIndex+1}/{images.length}</div>
 		</div>
 	{:else if page === 'directoryList'}
-		<Header doShowHelp={showHelp} />
+		<Header doHome={showHome} currentPath={currentPath} basePath={basePath} doShowHelp={showHelp} />
+		{#if images.length > 0}
+			<button on:click={showRandomImage}>Show {images.length} images</button>
+		{/if}
 		{#each directories as dir}
-			<button on:click={showPath(dir)}>
-				{decodeURI(dir)}
+			<button on:click={loadPath(dir.link)}>
+				{dir.name}
 			</button>
 		{/each}
 	{:else if page === 'help'}
-		<Header doShowHelp={showHelp} />
+		<Header doHome={showHome} currentPath={currentPath} basePath={basePath} doShowHelp={showHelp} />
 		<Help doClose={showDirectoryList}/>
 	{:else}
-		<Header doShowHelp={showHelp} />
+		<Header doHome={showHome} currentPath={currentPath} basePath={basePath} doShowHelp={showHelp} />
 		Loading...
 	{/if}
 </main>
