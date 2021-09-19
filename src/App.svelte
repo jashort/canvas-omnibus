@@ -16,9 +16,18 @@
 	loadPath(currentPath)
 
 	async function loadPath(path) {
-		console.log('Loading ' + path + '...');
-		let links = await getLinks(path)
-		currentPath = path;
+		console.log('Loading ' + path);
+		let newPath = path;
+		if (path === '..') {
+			const splitPath = currentPath.split('/')
+			if (splitPath.length < 3) {
+				newPath = basePath;
+			} else {
+				newPath = splitPath.slice(0, splitPath.length-2).join('/') + '/';
+			}
+		}
+		let links = await getLinks(newPath);
+		currentPath = newPath;
 		directories = links.filter(e => e.type === 'directory')
 		images = links.filter(e => e.type === 'image')
 
@@ -29,10 +38,16 @@
 		} else {
 			alert('no images found');
 		}
+
 	}
 
 	function showDirectoryList() {
 		page = 'directoryList';
+	}
+
+	function goUp() {
+		console.log(currentPath);
+		loadPath('..');
 	}
 
 	function showHome() {
@@ -51,6 +66,7 @@
 		} else {
 			currentImageIndex = 0;
 		}
+		console.log(images[currentImageIndex].url);
 		imageUrl = images[currentImageIndex].url;
 	}
 
@@ -60,6 +76,7 @@
 		} else {
 			currentImageIndex = images.length - 1;
 		}
+		console.log(images[currentImageIndex].url);
 		imageUrl = images[currentImageIndex].url;
 	}
 
@@ -107,6 +124,10 @@
 		<Header doHome={showHome} currentPath={currentPath} basePath={basePath} doShowHelp={showHelp} />
 		{#if images.length > 0}
 			<button on:click={showRandomImage}>Show {images.length} images</button>
+		{/if}
+
+		{#if currentPath !== basePath}
+			<button on:click={goUp}>Up</button>
 		{/if}
 		{#each directories as dir}
 			<button on:click={loadPath(dir.link)}>
