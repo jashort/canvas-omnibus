@@ -31,7 +31,7 @@ function findLinks(path, pageBody) {
                 fullURI = tmpPath + fullURI
             }
             const lower = link.toLowerCase();
-            if (link.endsWith('/')) {                                    // Directory
+            if (link.endsWith('/') && link.length > 1) {                // Directory
                 output.push({type: 'directory', name: decodeURI(link), link: fullURI})
             } else {                                                    // File
                 if (lower.endsWith('.png') ||
