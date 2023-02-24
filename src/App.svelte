@@ -114,23 +114,23 @@
 <main>
 	{#if page === 'slide'}
 		<div class="fullscreen" id="fullscreen" style="background-image: url('{imageUrl}')">
-			<div class="nav navUp" on:click="{showDirectoryList}"></div>
-			<div class="nav navNext" on:click="{showNext}"></div>
-			<div class="nav navPrev" on:click="{showPrev}"></div>
-			<div class="back" on:click={showDirectoryList}>Back</div>
+			<div class="nav navUp" on:click="{showDirectoryList}" on:keydown="{showDirectoryList}"></div>
+			<div class="nav navNext" on:click="{showNext}" on:keydown="{showNext}"></div>
+			<div class="nav navPrev" on:click="{showPrev}" on:keydown="{showPrev}"></div>
+			<div class="back" on:click={showDirectoryList} on:keydown={showDirectoryList}>Back</div>
 			<div class="filename" id="filename">{currentImageIndex+1}/{images.length}</div>
 		</div>
 	{:else if page === 'directoryList'}
 		<Header doHome={showHome} currentPath={currentPath} basePath={basePath} doShowHelp={showHelp} />
 		{#if images.length > 0}
-			<button on:click={showRandomImage}>Show {images.length} images</button>
+			<button on:click={showRandomImage} on:keydown={showRandomImage}>Show {images.length} images</button>
 		{/if}
 
 		{#if currentPath !== basePath}
-			<button on:click={goUp}>Up</button>
+			<button on:click={goUp} on:keydown={goUp}>Up</button>
 		{/if}
 		{#each directories as dir}
-			<button on:click={loadPath(dir.link)}>
+			<button on:click={loadPath(dir.link)} on:keydown={loadPath(dir.link)}>
 				{dir.name}
 			</button>
 		{/each}
