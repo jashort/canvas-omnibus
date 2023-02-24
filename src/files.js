@@ -23,7 +23,7 @@ function findLinks(path, pageBody) {
     const output = [];
 
     for (let i=0; i<links.length; i++) {
-        if (links.item(i).text !== '../') {
+        if (links.item(i).text !== '../' && links.item(i).text !== "Parent Directory") {
             const url = new URL(links.item(i));
             let link = url.pathname;
             let fullURI = url.pathname;
