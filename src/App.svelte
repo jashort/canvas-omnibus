@@ -8,7 +8,7 @@
 	let currentPath = basePath;
 	let currentImageIndex = 0;
 	let imageUrl = '';
-
+	let renderVideo = true;	// Workaround to make sure videos change on next/prev
 	let directories = [];
 	let images = [];
 	let page = "";
@@ -66,8 +66,9 @@
 		} else {
 			currentImageIndex = 0;
 		}
-		console.log(images[currentImageIndex].url);
 		imageUrl = images[currentImageIndex].url;
+		renderVideo = false;
+		setTimeout(() => renderVideo = true, 0);
 	}
 
 	function showPrev() {
@@ -76,8 +77,9 @@
 		} else {
 			currentImageIndex = images.length - 1;
 		}
-		console.log(images[currentImageIndex].url);
-		imageUrl = images[currentImageIndex].url;
+        imageUrl = images[currentImageIndex].url;
+        renderVideo = false;
+        setTimeout(() => renderVideo = true, 0);
 	}
 
 	function showHelp() {
@@ -113,13 +115,28 @@
 
 <main>
 	{#if page === 'slide'}
-		<div class="fullscreen" id="fullscreen" style="background-image: url('{imageUrl}')">
-			<div class="nav navUp" on:click="{showDirectoryList}" on:keydown="{showDirectoryList}"></div>
-			<div class="nav navNext" on:click="{showNext}" on:keydown="{showNext}"></div>
-			<div class="nav navPrev" on:click="{showPrev}" on:keydown="{showPrev}"></div>
-			<div class="back" on:click={showDirectoryList} on:keydown={showDirectoryList}>Back</div>
-			<div class="filename" id="filename">{currentImageIndex+1}/{images.length}</div>
-		</div>
+        {#if imageUrl.toLowerCase().endsWith('mp4') || imageUrl.toLowerCase().endsWith('webm') }
+            <div class="fullscreen" id="fullscreen">
+                {#if renderVideo === true}
+                    <video loop autoplay controls style="width: 100%; height: 100%;">
+                        <source src="{imageUrl}">
+                    </video>
+                {/if}
+				<div class="nav navUp" on:click="{showDirectoryList}" on:keydown="{showDirectoryList}"></div>
+				<div class="nav navNext" on:click="{showNext}" on:keydown="{showNext}"></div>
+				<div class="nav navPrev" on:click="{showPrev}" on:keydown="{showPrev}"></div>
+				<div class="back" on:click={showDirectoryList} on:keydown={showDirectoryList}>Back</div>
+				<div class="filename" id="filename">{currentImageIndex+1}/{images.length}</div>
+			</div>
+        {:else}
+			<div class="fullscreen" id="fullscreen" style="background-image: url('{imageUrl}')">
+				<div class="nav navUp" on:click="{showDirectoryList}" on:keydown="{showDirectoryList}"></div>
+				<div class="nav navNext" on:click="{showNext}" on:keydown="{showNext}"></div>
+				<div class="nav navPrev" on:click="{showPrev}" on:keydown="{showPrev}"></div>
+				<div class="back" on:click={showDirectoryList} on:keydown={showDirectoryList}>Back</div>
+				<div class="filename" id="filename">{currentImageIndex+1}/{images.length}</div>
+			</div>
+		{/if}
 	{:else if page === 'directoryList'}
 		<Header doHome={showHome} currentPath={currentPath} basePath={basePath} doShowHelp={showHelp} />
 		{#if images.length > 0}
@@ -195,7 +212,7 @@
 		top: 25%;
 		left: 0;
 		right: 0;
-		bottom: 0;
+		bottom: 50px;
 		text-align: left;
 		vertical-align: middle;
 	}

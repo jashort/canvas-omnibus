@@ -38,6 +38,7 @@ function findLinks(path, pageBody) {
                     lower.endsWith('.jpg') ||
                     lower.endsWith('.jpeg') ||
                     lower.endsWith('.webm') ||
+                    lower.endsWith(('.mp4')) ||
                     lower.endsWith('gif')) {
                     output.push({type: 'image', name: decodeURI(url), url: fullURI})
                 } else if (lower.endsWith(('.txt')))  {
